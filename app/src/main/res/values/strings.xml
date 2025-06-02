@@ -12,9 +12,6 @@
     <string name="permission_denied_message_legacy">This app requires Root access to function. Please grant permission.</string> <!-- Giữ lại nếu cần cho trường hợp khác, hoặc xóa -->
     <string name="permission_explicitly_denied_message">Root access for %1$s was denied. Please open your root management app (e.g., Magisk) and grant permission to %1$s to continue.</string> <!-- %1$s sẽ là tên app -->
     <string name="no_root_detected_message">Root access not detected on this device. This app cannot function without it.</string>
-    <!-- Không cần retry_request_root_button nữa -->
-    <!-- <string name="retry_request_root_button">Retry Root Request</string> -->
-    <!-- <string name="grant_permission_button">Grant Permission</string> -->
     <string name="exit_app_button">Exit App</string>
 
 
@@ -31,6 +28,7 @@
     <string name="search_apps_hint">Filter</string>
     <string name="switch_text_system">System</string>
     <string name="switch_text_user">User</string>
+    <string name="export_app_list_button">Export</string> <!-- NEW STRING -->
     <string name="warning_modify_system_app">WARNING: %1$s a system app can lead to instability. Proceed with caution.</string>
     <string name="warning_modify_core_android">This appears to be a CORE Android component. %1$s it is highly discouraged and may break your system!</string>
     <string name="warning_modify_google_app">This appears to be a Google app. %1$s it might affect other Google services.</string>

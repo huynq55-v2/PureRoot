@@ -10,8 +10,10 @@
         android:id="@+id/searchViewApps"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:queryHint="Search apps..."
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:queryHint="@string/search_apps_hint"
         app:iconifiedByDefault="false"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,10 +24,26 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
-        android:text="System"
+        android:text="@string/switch_text_system"
         app:layout_constraintTop_toTopOf="@+id/searchViewApps"
         app:layout_constraintBottom_toBottomOf="@+id/searchViewApps"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@+id/btnExportAppList" />
+
+    <Button
+        android:id="@+id/btnExportAppList"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/export_app_list_button"
+        android:minWidth="0dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:textColor="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/searchViewApps"
+        app:layout_constraintBottom_toBottomOf="@+id/searchViewApps"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewApps"

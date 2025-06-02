@@ -1,15 +1,20 @@
 package com.quanghuy2309.pureroot
 
-import android.graphics.Color // Import Color
-import android.graphics.Paint // Import Paint
+import android.app.Activity // Added for ActivityResultLauncher
+import android.content.Intent // Added for ACTION_CREATE_DOCUMENT
+import android.graphics.Color
+import android.graphics.Paint
+import android.net.Uri // Added for Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button // Xóa import này nếu nút Test SU bị xóa
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher // Added for ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts // Added for ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -23,6 +28,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.launch
+import java.io.IOException // Added for IOException
+import java.text.SimpleDateFormat // Added for Date formatting
+import java.util.Date // Added for Date
+import java.util.Locale // Added for Locale
 
 class AppListActivity : BaseRootActivity() {
 
@@ -31,18 +40,33 @@ class AppListActivity : BaseRootActivity() {
     }
 
     private val viewModel: AppListViewModel by viewModels()
-    private lateinit var appListAdapter: AppListAdapter // Sẽ được cập nhật
+    private lateinit var appListAdapter: AppListAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchView: SearchView
     private lateinit var switchAppType: SwitchMaterial
     private lateinit var progressBar: ProgressBar
-    // private lateinit var btnTestSu: Button // Xóa nút Test SU
+    private lateinit var btnExportAppList: Button // MODIFICATION: Added export button
+
+    // MODIFICATION: Launcher for creating the export file
+    private lateinit var exportFileLauncher: ActivityResultLauncher<Intent>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_list)
         title = getString(R.string.app_list_title)
         Log.d(TAG, "onCreate - AppListActivity started.")
+
+        // MODIFICATION: Initialize the export file launcher
+        exportFileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    val dataToExport = viewModel.getAppListExportData()
+                    writeTextToUri(uri, dataToExport)
+                }
+            }
+        }
+
         setupUI()
         observeViewModelState()
         observeActionResults()
@@ -53,11 +77,10 @@ class AppListActivity : BaseRootActivity() {
         searchView = findViewById(R.id.searchViewApps)
         switchAppType = findViewById(R.id.switchAppType)
         progressBar = findViewById(R.id.progressBarLoading)
+        btnExportAppList = findViewById(R.id.btnExportAppList) // MODIFICATION: Initialize export button
 
-        // Khởi tạo AppListAdapter (nó đã được import từ file riêng)
-        appListAdapter = AppListAdapter { appInfo -> // Lambda này giờ sẽ trực tiếp gọi confirm
+        appListAdapter = AppListAdapter { appInfo ->
             Log.d(TAG, "App clicked: ${appInfo.appName}, Enabled: ${appInfo.isEnabled}")
-            // Thay vì hiển thị menu, gọi thẳng confirmAction dựa trên trạng thái hiện tại
             if (appInfo.isEnabled) {
                 confirmAction(appInfo, getString(R.string.action_disable_app_short)) { viewModel.disableApp(appInfo) }
             } else {
@@ -86,10 +109,14 @@ class AppListActivity : BaseRootActivity() {
 
         val initialFilterIsSystem = viewModel.uiState.value.currentFilterType == AppFilterType.SYSTEM_APPS
         switchAppType.isChecked = initialFilterIsSystem
-        // updateSwitchText(initialFilterIsSystem) // Sẽ được gọi qua observeViewModelState
 
         switchAppType.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setAppFilterType(if (isChecked) AppFilterType.SYSTEM_APPS else AppFilterType.USER_APPS)
+        }
+
+        // MODIFICATION: Set onClickListener for the export button
+        btnExportAppList.setOnClickListener {
+            initiateExportAppList()
         }
     }
 
@@ -147,7 +174,6 @@ class AppListActivity : BaseRootActivity() {
     override fun onRootVerified() {
         super.onRootVerified()
         Log.d(TAG, "Root access verified. AppListActivity can operate.")
-        // viewModel.refreshAppList() // Có thể refresh nếu cần
     }
 
     override fun onRootReacquired() {
@@ -156,41 +182,10 @@ class AppListActivity : BaseRootActivity() {
         viewModel.refreshAppList()
     }
 
-    private fun showAppActionDialog(appInfo: AppInfo) {
-        val actions = mutableListOf<String>()
-
-        if (appInfo.isEnabled) {
-            actions.add(getString(R.string.action_disable_app)) // "Disable App"
-        } else {
-            actions.add(getString(R.string.action_enable_app)) // "Enable App"
-        }
-        // Bạn có thể thêm các action khác như "App Info"
-        // actions.add(getString(R.string.action_app_info))
-
-        AlertDialog.Builder(this)
-            .setTitle("${appInfo.appName}\n(${appInfo.packageName})")
-            .setItems(actions.toTypedArray()) { dialog, which ->
-                when (actions[which]) {
-                    getString(R.string.action_disable_app) -> {
-                        confirmAction(appInfo, "Disable") { viewModel.disableApp(appInfo) }
-                    }
-                    getString(R.string.action_enable_app) -> {
-                        confirmAction(appInfo, "Enable") { viewModel.enableApp(appInfo) }
-                    }
-                    // getString(R.string.action_app_info) -> { /* Mở trang thông tin app hệ thống */ }
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton(getString(R.string.dialog_cancel), null)
-            .show()
-    }
-
     private fun confirmAction(appInfo: AppInfo, actionNameDisplay: String, actionToPerform: () -> Unit) {
-        // actionNameDisplay là text hiển thị cho hành động (ví dụ: "Disable", "Enable")
         var warningMessage = ""
         if (appInfo.isSystemApp) {
             warningMessage = "\n\n${getString(R.string.warning_modify_system_app, actionNameDisplay.lowercase())}"
-            // ... (các cảnh báo khác cho core android / google app giữ nguyên) ...
             if (appInfo.packageName.startsWith("com.android") || appInfo.packageName.startsWith("com.google.android.inputmethod")) {
                 warningMessage += "\n\n${getString(R.string.warning_modify_core_android, actionNameDisplay.lowercase())}"
             } else if (appInfo.packageName.startsWith("com.google.android")) {
@@ -199,9 +194,9 @@ class AppListActivity : BaseRootActivity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle("${getString(R.string.dialog_confirm_title)} $actionNameDisplay") // "Confirm Disable" hoặc "Confirm Enable"
+            .setTitle("${getString(R.string.dialog_confirm_title)} $actionNameDisplay")
             .setMessage("${getString(R.string.dialog_confirm_action_message, actionNameDisplay.lowercase(), appInfo.appName, appInfo.packageName)}$warningMessage")
-            .setPositiveButton(actionNameDisplay) { _, _ -> // Nút Positive sẽ là "Disable" hoặc "Enable"
+            .setPositiveButton(actionNameDisplay) { _, _ ->
                 actionToPerform()
             }
             .setNegativeButton(getString(R.string.dialog_cancel), null)
@@ -218,4 +213,33 @@ class AppListActivity : BaseRootActivity() {
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show()
     }
+
+    // START MODIFICATION: Methods for exporting app list
+    private fun initiateExportAppList() {
+        val appName = getString(R.string.app_name).replace(" ", "_")
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fileName = "${appName}_AppStatus_${timestamp}.csv"
+
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/csv" // MIME type for CSV
+            putExtra(Intent.EXTRA_TITLE, fileName)
+        }
+        exportFileLauncher.launch(intent)
+    }
+
+    private fun writeTextToUri(uri: Uri, text: String) {
+        try {
+            contentResolver.openOutputStream(uri)?.use { outputStream ->
+                outputStream.bufferedWriter().use { writer ->
+                    writer.write(text)
+                }
+                Toast.makeText(this, "App list exported successfully to Documents folder.", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Error exporting app list", e)
+            Toast.makeText(this, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+    // END MODIFICATION
 }

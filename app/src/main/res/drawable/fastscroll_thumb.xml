@@ -3,8 +3,8 @@
     <item> <!-- Trạng thái mặc định -->
         <shape android:shape="rectangle">
             <solid android:color="#A0A0A0" /> <!-- Màu xám cụ thể để test -->
-            <corners android:radius="4dp" />
-            <size android:width="8dp" />
+            <corners android:radius="6dp" /> <!-- Adjusted radius slightly for a wider thumb -->
+            <size android:width="12dp" /> <!-- MODIFIED: Increased width from 8dp -->
         </shape>
     </item>
 </selector>

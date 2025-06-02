@@ -230,7 +230,24 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // Hàm testSimpleSuCommand() đã được xóa
+    // START MODIFICATION: Method to get app list data for export
+    fun getAppListExportData(): String {
+        val exportData = StringBuilder()
+        exportData.append("Package Name,App Name,Status,Is System App\n") // CSV Header
+
+        // Use a sorted copy of allInstalledApps for consistent export order
+        val sortedApps = allInstalledApps.sortedBy { it.appName.lowercase() }
+
+        sortedApps.forEach { appInfo ->
+            val status = if (appInfo.isEnabled) "Enabled" else "Disabled"
+            val appType = if (appInfo.isSystemApp) "System" else "User"
+            // Sanitize appName if it might contain commas for CSV integrity
+            val sanitizedAppName = appInfo.appName.replace(",", ";")
+            exportData.append("${appInfo.packageName},\"${sanitizedAppName}\",${status},${appType}\n")
+        }
+        return exportData.toString()
+    }
+    // END MODIFICATION
 }
 
 // Extension functions để đóng resource an toàn
