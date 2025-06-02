@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">PureRoot</string>
+
+    <!-- MainActivity / Root Check -->
+    <string name="checking_root_status">Checking Root status...</string>
+    <string name="root_granted_initial">Root access granted.</string>
+    <string name="root_denied_initial">Root access denied or not available.</string>
+    <string name="exiting_no_root">Exiting: Root access is required.</string>
+
+    <!-- PermissionDeniedActivity -->
+    <string name="permission_denied_title">Permission Required</string>
+    <string name="permission_denied_message_legacy">This app requires Root access to function. Please grant permission.</string> <!-- Giữ lại nếu cần cho trường hợp khác, hoặc xóa -->
+    <string name="permission_explicitly_denied_message">Root access for %1$s was denied. Please open your root management app (e.g., Magisk) and grant permission to %1$s to continue.</string> <!-- %1$s sẽ là tên app -->
+    <string name="no_root_detected_message">Root access not detected on this device. This app cannot function without it.</string>
+    <!-- Không cần retry_request_root_button nữa -->
+    <!-- <string name="retry_request_root_button">Retry Root Request</string> -->
+    <!-- <string name="grant_permission_button">Grant Permission</string> -->
+    <string name="exit_app_button">Exit App</string>
+
+
+    <!-- AppListActivity -->
+    <string name="app_list_title">Application List</string>
+    <string name="action_disable_app">Disable App</string>
+    <string name="action_enable_app">Enable App</string>
+    <string name="action_disable_app_short">Disable</string> <!-- Dùng cho nút và tiêu đề dialog ngắn gọn -->
+    <string name="action_enable_app_short">Enable</string>  <!-- Dùng cho nút và tiêu đề dialog ngắn gọn -->
+    <string name="action_app_info">App Info</string>
+    <string name="dialog_confirm_title">Confirm</string> <!-- Tiêu đề chung cho dialog xác nhận -->
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_ok">OK</string>
+    <string name="search_apps_hint">Filter</string>
+    <string name="switch_text_system">System</string>
+    <string name="switch_text_user">User</string>
+    <string name="warning_modify_system_app">WARNING: %1$s a system app can lead to instability. Proceed with caution.</string>
+    <string name="warning_modify_core_android">This appears to be a CORE Android component. %1$s it is highly discouraged and may break your system!</string>
+    <string name="warning_modify_google_app">This appears to be a Google app. %1$s it might affect other Google services.</string>
+    <string name="dialog_confirm_action_message">Are you sure you want to %1$s %2$s?\nPackage: %3$s</string>
+
+    <!-- General -->
+    <string name="error_occurred">An error occurred</string>
+
+    <string name="exiting_no_root_soon">Root access still not available. The app may not function correctly.</string>
+</resources>
