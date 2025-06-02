@@ -37,13 +37,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_app_info" />
-<!--        android:scrollbars="vertical"-->
-<!--        app:fastScrollEnabled="false" />-->
-<!--        app:fastScrollVerticalThumbDrawable="@drawable/fastscroll_thumb"-->
-<!--        app:fastScrollVerticalTrackDrawable="@drawable/fastscroll_track" />-->
-<!--        app:fastScrollHorizontalThumbDrawable="@drawable/fastscroll_thumb"-->
-<!--        app:fastScrollHorizontalTrackDrawable="@drawable/fastscroll_track" />-->
+        tools:listitem="@layout/item_app_info"
+
+        app:fastScrollEnabled="true"
+        app:fastScrollVerticalThumbDrawable="@drawable/fastscroll_thumb"
+        app:fastScrollVerticalTrackDrawable="@drawable/fastscroll_track"
+        app:fastScrollHorizontalThumbDrawable="@drawable/fastscroll_thumb"
+        app:fastScrollHorizontalTrackDrawable="@drawable/fastscroll_track" />
 
     <ProgressBar
         android:id="@+id/progressBarLoading"

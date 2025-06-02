@@ -66,4 +66,6 @@ dependencies {
     // LiveData (hoặc StateFlow) - StateFlow đi kèm với coroutines-core
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0") // Nếu dùng LiveData
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3") // Cho StateFlow
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("com.google.android.material:material:1.12.0")
 }
